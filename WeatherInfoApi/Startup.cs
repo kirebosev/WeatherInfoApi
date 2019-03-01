@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using RestSharp;
 using Swashbuckle.AspNetCore.Swagger;
+using WeatherInfoApi.ApiCalls;
+using WeatherInfoApi.ApiCalls.Interfaces;
+using WeatherInfoApi.Handler;
+using WeatherInfoApi.Handler.Interfaces;
+using WeatherInfoApi.ObjectModel.Config;
 
 namespace WeatherInfoApi
 {
@@ -26,7 +27,24 @@ namespace WeatherInfoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var ipStakConfig = Configuration.GetSection("IpStakConfig");
+            var openWeatherConfig = Configuration.GetSection("OpenWeatherConfig");
+
+            services.Configure<IpStakConfig>(ipStakConfig);
+            services.Configure<OpenWeatherConfig>(openWeatherConfig);
+
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddHttpContextAccessor();
+            services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            services.AddTransient<IRestClient, RestClient>();
+
+            services.AddTransient<IGetWeatherHandler, GetWeatherHandler>();
+
+            services.AddTransient<IGetOpenWeatherInfo, GetOpenWeatherInfo>();
+            services.AddTransient<IGetUserInfoByIpAddress, GetUserInfoByIpAddress>();
 
             services.AddSwaggerGen(c =>
             {
@@ -55,7 +73,6 @@ namespace WeatherInfoApi
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather Info API V1");
             });
-
 
             app.UseHttpsRedirection();
             app.UseMvc();
