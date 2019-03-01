@@ -36,6 +36,12 @@ namespace WeatherInfoApi.ApiCalls
                 var response = await taskCompletion.Task;
 
                 var currentResponse = JsonConvert.DeserializeObject<UserInfoResponse>(response.Content);
+                currentResponse.StausCode = response.StatusCode;
+
+                if(currentResponse.StausCode != System.Net.HttpStatusCode.OK)
+                {
+                    currentResponse.Errors.Add(response.Content);
+                }
 
                 return currentResponse;
 

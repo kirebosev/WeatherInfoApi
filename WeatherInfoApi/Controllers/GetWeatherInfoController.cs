@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WeatherInfoApi.Handler.Interfaces;
+using WeatherInfoApi.ObjectModel;
+using WeatherInfoApi.ObjectModel.Responses;
 
 namespace WeatherInfoApi.Controllers
 {
@@ -21,9 +23,9 @@ namespace WeatherInfoApi.Controllers
         [HttpGet]
         [Route("getweather")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(WeatherInfoResponse), 200)]
         [ProducesResponseType(typeof(void), 401)]
-        [ProducesResponseType(typeof(string), 500)]
+        [ProducesResponseType(typeof(ErrorMessageResponse), 500)]
         public async Task<ActionResult> Get()
         {
             var result = await _getWeatherHandler.Execute();

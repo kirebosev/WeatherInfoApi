@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using WeatherInfoApi.ApiCalls.Interfaces;
 using WeatherInfoApi.Handler.Interfaces;
-using WeatherInfoApi.ObjectModel;
 using WeatherInfoApi.ObjectModel.Responses;
 
 namespace WeatherInfoApi.Handler
@@ -40,30 +38,37 @@ namespace WeatherInfoApi.Handler
             };
             try
             {
-                var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); // "89.205.122.48";
+                var ipAddress = "89.205.122.48";//_httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); // 
 
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
                     var getUserInfo = await _getUserInfoByIpAddress.Execute(ipAddress);
 
-                    var openWeatherInfoResponse = await _getOpenWeatherInfo.GetWeatherInfo(getUserInfo.city);
-
-                    if(openWeatherInfoResponse.StausCode == System.Net.HttpStatusCode.OK)
+                    if (getUserInfo.StausCode == System.Net.HttpStatusCode.OK)
                     {
-                        currentResponse.StausCode = openWeatherInfoResponse.StausCode;
-                        currentResponse.City = openWeatherInfoResponse.name;
-                        currentResponse.Coord.lat = openWeatherInfoResponse.coord.lat;
-                        currentResponse.Coord.lon = openWeatherInfoResponse.coord.lon;
-                        currentResponse.MainInfo.temp = openWeatherInfoResponse.main.temp;
-                        currentResponse.MainInfo.temp_min = openWeatherInfoResponse.main.temp_min;
-                        currentResponse.MainInfo.temp_max = openWeatherInfoResponse.main.temp_max;
+                        var openWeatherInfoResponse = await _getOpenWeatherInfo.GetWeatherInfo(getUserInfo.city);
+
+                        if (openWeatherInfoResponse.StausCode == System.Net.HttpStatusCode.OK)
+                        {
+                            currentResponse.StausCode = openWeatherInfoResponse.StausCode;
+                            currentResponse.City = openWeatherInfoResponse.name;
+                            currentResponse.Coord.lat = openWeatherInfoResponse.coord.lat;
+                            currentResponse.Coord.lon = openWeatherInfoResponse.coord.lon;
+                            currentResponse.MainInfo.temp = openWeatherInfoResponse.main.temp;
+                            currentResponse.MainInfo.temp_min = openWeatherInfoResponse.main.temp_min;
+                            currentResponse.MainInfo.temp_max = openWeatherInfoResponse.main.temp_max;
+                        }
+                        else
+                        {
+                            currentResponse.StausCode = openWeatherInfoResponse.StausCode;
+                            currentResponse.Errors = openWeatherInfoResponse.Errors;
+                        }
                     }
                     else
                     {
-                        currentResponse.StausCode = openWeatherInfoResponse.StausCode;
-                        currentResponse.Errors = openWeatherInfoResponse.Errors;
+                        currentResponse.StausCode = getUserInfo.StausCode;
+                        currentResponse.Errors = getUserInfo.Errors;
                     }                    
-                    
                 }
                 else
                 {
