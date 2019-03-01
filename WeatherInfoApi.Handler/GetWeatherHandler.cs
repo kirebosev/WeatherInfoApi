@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using WeatherInfoApi.ApiCalls.Interfaces;
@@ -12,12 +13,20 @@ namespace WeatherInfoApi.Handler
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IGetOpenWeatherInfo _getOpenWeatherInfo;
         private readonly IGetUserInfoByIpAddress _getUserInfoByIpAddress;
+        private readonly IGetCityByIpAddress _getCityByIpAddress;
+        private readonly ILogger _logger;
 
-        public GetWeatherHandler(IHttpContextAccessor httpContextAccessor, IGetOpenWeatherInfo getOpenWeatherInfo, IGetUserInfoByIpAddress getUserInfoByIpAddress)
+        public GetWeatherHandler(IHttpContextAccessor httpContextAccessor,
+            IGetOpenWeatherInfo getOpenWeatherInfo, 
+            IGetUserInfoByIpAddress getUserInfoByIpAddress,
+            IGetCityByIpAddress getCityByIpAddress,
+            ILogger<GetWeatherHandler> logger)
         {
             _httpContextAccessor = httpContextAccessor;
             _getOpenWeatherInfo = getOpenWeatherInfo;
             _getUserInfoByIpAddress = getUserInfoByIpAddress;
+            _getCityByIpAddress = getCityByIpAddress;
+            _logger = logger;
         }
 
         public async Task<WeatherInfoResponse> Execute()
@@ -33,16 +42,17 @@ namespace WeatherInfoApi.Handler
                 {
                     temp = new double(),
                     temp_max = new double(),
-                    temp_min = new int()
+                    temp_min = new double()
                 }                
             };
             try
             {
-                var ipAddress = "89.205.122.48";//_httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); // 
+                var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); 
 
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
-                    var getUserInfo = await _getUserInfoByIpAddress.Execute(ipAddress);
+                    _logger.LogInformation($"IpAddress -- {ipAddress}");
+                    var getUserInfo = await _getCityByIpAddress.Execute(ipAddress);
 
                     if (getUserInfo.StausCode == System.Net.HttpStatusCode.OK)
                     {

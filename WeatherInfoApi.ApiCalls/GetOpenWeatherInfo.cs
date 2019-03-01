@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -14,11 +15,15 @@ namespace WeatherInfoApi.ApiCalls
     {
         private readonly IRestClient _restClient;
         private readonly OpenWeatherConfig _openWeatherConfig;
+        private readonly ILogger _logger;
 
-        public GetOpenWeatherInfo(IRestClient restClient, IOptions<OpenWeatherConfig> openWeatherConfig)
+        public GetOpenWeatherInfo(IRestClient restClient, 
+            IOptions<OpenWeatherConfig> openWeatherConfig,
+            ILogger<GetOpenWeatherInfo> logger)
         {
             _openWeatherConfig = openWeatherConfig.Value;
             _restClient = restClient;
+            _logger = logger;
         }
         public async Task<OpenWeatherInfoResponse> GetWeatherInfo(string city)
         {
@@ -40,12 +45,14 @@ namespace WeatherInfoApi.ApiCalls
                 if(currentResponse.StausCode != System.Net.HttpStatusCode.OK)
                 {
                     currentResponse.Errors.Add(response.Content);
+                    _logger.LogError($"Error -- {JsonConvert.SerializeObject(response.Content)}");
                 }
-
+                _logger.LogInformation($"End -- {JsonConvert.SerializeObject(currentResponse)}");
                 return currentResponse;
             }
             catch(Exception ex)
             {
+                _logger.LogError($"Error -- {ex.Message}");
                 throw ex;
             }
         }

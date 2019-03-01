@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using WeatherInfoApi.Handler.Interfaces;
 using WeatherInfoApi.ObjectModel;
 using WeatherInfoApi.ObjectModel.Responses;
@@ -35,7 +36,7 @@ namespace WeatherInfoApi.Controllers
 
             var result = await _getWeatherHandler.Execute();
 
-            _logger.LogInformation("End");
+            _logger.LogInformation($"End --- {JsonConvert.SerializeObject(result)}");
 
             return StatusCode((int)result.StausCode, result);
         }

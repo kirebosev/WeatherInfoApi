@@ -40,12 +40,15 @@ namespace WeatherInfoApi
             services.AddHttpContextAccessor();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-            services.AddTransient<IRestClient, RestClient>();
+            services.AddTransient<IRestClient, RestClient>();            
 
             services.AddTransient<IGetWeatherHandler, GetWeatherHandler>();
 
             services.AddTransient<IGetOpenWeatherInfo, GetOpenWeatherInfo>();
             services.AddTransient<IGetUserInfoByIpAddress, GetUserInfoByIpAddress>();
+            services.AddTransient<IGetCityByIpAddress, GetCityByIpAddress>();
+
+            services.AddLogging();
 
             services.AddSwaggerGen(c =>
             {
