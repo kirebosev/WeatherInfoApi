@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using RestSharp;
 using Swashbuckle.AspNetCore.Swagger;
 using WeatherInfoApi.ApiCalls;
@@ -53,7 +54,7 @@ namespace WeatherInfoApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory logger)
         {
             if (env.IsDevelopment())
             {
@@ -63,6 +64,8 @@ namespace WeatherInfoApi
             {
                 app.UseHsts();
             }
+
+            //logger.AddAzureWebAppDiagnostics();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
