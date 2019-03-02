@@ -28,8 +28,7 @@ namespace WeatherInfoApi.ApiCalls
 
                 var taskCompletion = new TaskCompletionSource<IRestResponse>();
 
-                var restResult = _restClient.ExecuteAsync(restRequest, restResponse =>
-                taskCompletion.SetResult(restResponse));
+                _restClient.ExecuteAsync(restRequest, restResponse => taskCompletion.SetResult(restResponse));
 
                 var response = await taskCompletion.Task;
 
@@ -39,15 +38,17 @@ namespace WeatherInfoApi.ApiCalls
                 if (currentResponse.StausCode != System.Net.HttpStatusCode.OK)
                 {
                     currentResponse.Errors.Add(response.Content);
+                    _logger.LogError($"Error -- {JsonConvert.SerializeObject(response.Content)}");
                 }
 
+                _logger.LogInformation($"Success -- {JsonConvert.SerializeObject(currentResponse)}");
                 return currentResponse;
             } 
             catch(Exception ex)
             {
+                _logger.LogError($"Exception -- {ex.Message}");
                 throw ex;
             }
-            throw new System.NotImplementedException();
         }
     }
 }

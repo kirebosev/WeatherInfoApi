@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using WeatherInfoApi.ApiCalls.Interfaces;
 using WeatherInfoApi.Handler.Interfaces;
 using WeatherInfoApi.ObjectModel.Responses;
@@ -52,13 +54,14 @@ namespace WeatherInfoApi.Handler
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
                     _logger.LogInformation( $"IpAddress -- {ipAddress}");
+
                     var getUserInfo = await _getCityByIpAddress.Execute(ipAddress);
 
                     if (getUserInfo.StausCode == System.Net.HttpStatusCode.OK)
                     {
                         var openWeatherInfoResponse = await _getOpenWeatherInfo.GetWeatherInfo(getUserInfo.city);
 
-                        if (openWeatherInfoResponse.StausCode == System.Net.HttpStatusCode.OK)
+                        if (openWeatherInfoResponse.StausCode == HttpStatusCode.OK)
                         {
                             currentResponse.StausCode = openWeatherInfoResponse.StausCode;
                             currentResponse.City = openWeatherInfoResponse.name;
@@ -72,25 +75,28 @@ namespace WeatherInfoApi.Handler
                         {
                             currentResponse.StausCode = openWeatherInfoResponse.StausCode;
                             currentResponse.Errors = openWeatherInfoResponse.Errors;
+                            _logger.LogError($"Error -- {JsonConvert.SerializeObject(currentResponse)}");
                         }
                     }
                     else
                     {
                         currentResponse.StausCode = getUserInfo.StausCode;
                         currentResponse.Errors = getUserInfo.Errors;
+                        _logger.LogError($"Error -- {JsonConvert.SerializeObject(currentResponse)}");
                     }                    
                 }
                 else
                 {
                     currentResponse.Errors.Add( "We can't detect the IpAddress");
-                    currentResponse.StausCode = System.Net.HttpStatusCode.InternalServerError;
-                    return currentResponse;
+                    currentResponse.StausCode = HttpStatusCode.InternalServerError;
+                    _logger.LogError($"Error -- {JsonConvert.SerializeObject(currentResponse)}");
                 }
             }
             catch(Exception ex)
             {
                 currentResponse.Errors.Add(ex.Message);
                 currentResponse.StausCode = System.Net.HttpStatusCode.InternalServerError;
+                _logger.LogError($"Exception -- {JsonConvert.SerializeObject(currentResponse)}");
             }
 
             return currentResponse;

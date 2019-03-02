@@ -10,8 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.2" />    
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.1.0" />
@@ -21,6 +20,10 @@
   <ItemGroup>
     <ProjectReference Include="..\WeatherInfoApi.Handler\WeatherInfoApi.Handler.csproj" />
     <ProjectReference Include="..\WeatherInfoApi.ObjectModel\WeatherInfoApi.ObjectModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NETCore.App" Version="2.2.2" />
   </ItemGroup>
 
 </Project>

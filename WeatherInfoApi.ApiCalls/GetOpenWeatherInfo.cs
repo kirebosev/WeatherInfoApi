@@ -5,7 +5,6 @@ using RestSharp;
 using System;
 using System.Threading.Tasks;
 using WeatherInfoApi.ApiCalls.Interfaces;
-using WeatherInfoApi.ObjectModel;
 using WeatherInfoApi.ObjectModel.Config;
 using WeatherInfoApi.ObjectModel.Responses;
 
@@ -35,8 +34,7 @@ namespace WeatherInfoApi.ApiCalls
 
                 var taskCompletion = new TaskCompletionSource<IRestResponse>();
 
-                var restResult = _restClient.ExecuteAsync(restRequest, restResponse =>
-                taskCompletion.SetResult(restResponse));
+                _restClient.ExecuteAsync(restRequest, restResponse => taskCompletion.SetResult(restResponse));
 
                 var response = await taskCompletion.Task;
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
@@ -13,25 +14,28 @@ namespace WeatherInfoApi.ApiCalls
     {
         private readonly IRestClient _restClient;
         private readonly IpStakConfig _ipStakConfig;
+        private readonly ILogger _logger;
 
-        public GetUserInfoByIpAddress(IRestClient restClient, IOptions<IpStakConfig> ipStakConfig)
+        public GetUserInfoByIpAddress(IRestClient restClient,
+            IOptions<IpStakConfig> ipStakConfig,
+            ILogger<GetUserInfoByIpAddress> logger)
         {
             _restClient = restClient;
             _ipStakConfig = ipStakConfig.Value;
+            _logger = logger;
         }
 
-        public async Task<UserInfoResponse> Execute(string IpAddress)
+        public async Task<UserInfoResponse> Execute(string ipAddress)
         {
             try
             {
-                _restClient.BaseUrl = new Uri($"{_ipStakConfig.BaseUrl}{IpAddress}?access_key={_ipStakConfig.Apikey}");
+                _restClient.BaseUrl = new Uri($"{_ipStakConfig.BaseUrl}{ipAddress}?access_key={_ipStakConfig.Apikey}");
 
                 var restRequest = new RestRequest(Method.GET);
 
                 var taskCompletion = new TaskCompletionSource<IRestResponse>();
 
-                var restResult = _restClient.ExecuteAsync(restRequest, restResponse =>
-                taskCompletion.SetResult(restResponse));
+                _restClient.ExecuteAsync(restRequest, restResponse => taskCompletion.SetResult(restResponse));
 
                 var response = await taskCompletion.Task;
 
@@ -41,15 +45,17 @@ namespace WeatherInfoApi.ApiCalls
                 if(currentResponse.StausCode != System.Net.HttpStatusCode.OK)
                 {
                     currentResponse.Errors.Add(response.Content);
+                    _logger.LogError($"Error -- {JsonConvert.SerializeObject(response.Content)}");
                 }
 
+                _logger.LogInformation($"Success -- {JsonConvert.SerializeObject(currentResponse)}");
                 return currentResponse;
-
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
+                _logger.LogError($"Exception -- {ex.Message}");
                 throw ex;
             }
-
         }
     }
 }
