@@ -47,11 +47,11 @@ namespace WeatherInfoApi.Handler
             };
             try
             {
-                var ipAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); 
+                var ipAddress = "92.53.44.70";//_httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); 
 
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
-                    _logger.LogInformation($"IpAddress -- {ipAddress}");
+                    _logger.LogInformation( $"IpAddress -- {ipAddress}");
                     var getUserInfo = await _getCityByIpAddress.Execute(ipAddress);
 
                     if (getUserInfo.StausCode == System.Net.HttpStatusCode.OK)
