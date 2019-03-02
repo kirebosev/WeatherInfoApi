@@ -49,7 +49,8 @@ namespace WeatherInfoApi.Handler
             };
             try
             {
-                var ipAddress = "92.53.44.70";//_httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); 
+                var ipAddress =
+                    _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(); //"92.53.44.70";//
 
                 if (!string.IsNullOrEmpty(ipAddress))
                 {
