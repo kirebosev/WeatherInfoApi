@@ -56,9 +56,9 @@ namespace WeatherInfoApi.Handler
                 {
                     _logger.LogInformation( $"IpAddress -- {ipAddress}");
 
-                    var getUserInfo = await _getCityByIpAddress.Execute(ipAddress);
+                    var getUserInfo = await _getUserInfoByIpAddress.Execute(ipAddress);
 
-                    if (getUserInfo.StausCode == System.Net.HttpStatusCode.OK)
+                    if (getUserInfo.StausCode == HttpStatusCode.OK)
                     {
                         var openWeatherInfoResponse = await _getOpenWeatherInfo.GetWeatherInfo(getUserInfo.city);
 
