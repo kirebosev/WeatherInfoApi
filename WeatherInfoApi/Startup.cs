@@ -35,7 +35,7 @@ namespace WeatherInfoApi
             services.Configure<OpenWeatherConfig>(openWeatherConfig);
 
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             services.AddHttpContextAccessor();
             services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
